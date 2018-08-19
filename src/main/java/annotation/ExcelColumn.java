@@ -11,6 +11,6 @@ import java.util.Comparator;
 @Inherited
 public @interface ExcelColumn {
     String columnName();
-    int high() default 1;
     int sort();
+    String defaultValue() default "";
 }

@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 该注解用于ExcelBean
  * sheetName 生成的excel中的sheet名称
- * autoFormat 开启自动格式化列的格式，开启后将以所有列的最高高度作为合并高度，并居中，默认开启
+ * autoFormat 开启自动表格格式化列的格式，默认开启
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
