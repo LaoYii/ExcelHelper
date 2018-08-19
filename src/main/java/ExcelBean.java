@@ -136,12 +136,14 @@ public class ExcelBean {
         private String columnName;
         private int sort;
         private String defaultValue;
+        private Field field;
 
         public FieldInfo(Field field) {
             ExcelColumn annotation = field.getAnnotation(ExcelColumn.class);
             this.columnName = annotation.columnName();
             this.sort = annotation.sort();
             this.defaultValue = annotation.defaultValue();
+            this.field = field;
         }
 
         public String getColumnName() {
@@ -154,6 +156,10 @@ public class ExcelBean {
 
         public String getDefaultValue() {
             return defaultValue;
+        }
+
+        public Field getField() {
+            return field;
         }
     }
 }
