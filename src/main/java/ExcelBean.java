@@ -20,7 +20,7 @@ public class ExcelBean {
     private List<ColumnInfo> columnInfos;
     
     protected String getSheetName() {
-        if(this.sheetName  == null) return "Sheel1";
+        if(this.sheetName  == null) return "Sheet";
         return sheetName;
     }
 
