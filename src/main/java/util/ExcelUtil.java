@@ -10,39 +10,40 @@ import java.io.File;
 import java.util.Optional;
 
 public final class ExcelUtil {
-    
-    public static Workbook getWorkbook() throws ExcelFileError{
+
+    public static Workbook getWorkbook() throws ExcelFileError {
         return getWorkbook(null);
     }
-    
-    public static Workbook getWorkbook(File file) throws ExcelFileError{
+
+    public static Workbook getWorkbook(File file) throws ExcelFileError {
+        if (file == null) return new XSSFWorkbook();
         String fileSuffix = FileUtil.getFileSuffix(file.getPath());
-        if(".xls".equals(fileSuffix)) return new HSSFWorkbook();
-        if(file == null || ".xlsx".equals(fileSuffix)) return new XSSFWorkbook();
+        if (".xls".equals(fileSuffix)) return new HSSFWorkbook();
+        else if (".xlsx".equals(fileSuffix)) return new XSSFWorkbook();
         else throw new ExcelFileError(ExcelFileError.FILE_NAME_ERROR);
     }
 
-    public static Sheet getSheet(Workbook wb,String sheetName){
+    public static Sheet getSheet(Workbook wb, String sheetName) {
         Sheet sheet = null;
         if (StringUtil.isNotNull(sheetName)) {
             int nameloop = 0;
-            do{
+            do {
                 if (wb.getSheet(sheetName) != null) {
                     if (nameloop == 0) {
-                        sheetName = sheetName+nameloop;
-                    }else{
+                        sheetName = sheetName + nameloop;
+                    } else {
                         sheetName = sheetName.replace(String.valueOf(nameloop), String.valueOf(++nameloop));
                     }
-                }else {
+                } else {
                     sheet = wb.createSheet(sheetName);
                     break;
                 }
-            }while (true);
-        }else{
+            } while (true);
+        } else {
             sheet = wb.createSheet();
         }
         return sheet;
     }
-    
-    
+
+
 }

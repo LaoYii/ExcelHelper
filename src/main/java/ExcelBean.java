@@ -2,14 +2,16 @@ import annotation.AutoGeneateCoding;
 import annotation.ExcelColumn;
 import annotation.ExcelSheet;
 import annotation.ExcelTitle;
+import util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ExcelBean {
-    private boolean autoColumnFormat = true;
+    private boolean autoFormat = true;
     private boolean autoGeneateCoding = false;
     private String codingColumnName;
     private int codingStart;
@@ -17,13 +19,17 @@ public class ExcelBean {
     private String sheetTitle;
     private int columnSize = 0;
     private List<ColumnInfo> columnInfos;
-    
+
+    private boolean hasColumuTitle = false;
+    private List<Field> fields = new ArrayList<>();
+
+
     protected String getSheetName() {
         return sheetName;
     }
 
-    protected boolean isAutoColumnFormat() {
-        return autoColumnFormat;
+    protected boolean isAutoFormat() {
+        return autoFormat;
     }
 
     protected boolean isAutoGeneateCoding() {
@@ -50,25 +56,28 @@ public class ExcelBean {
         return columnInfos;
     }
 
+    public boolean isHasColumuTitle() {
+        return hasColumuTitle;
+    }
+
+    public List<Field> getFields() {
+        return fields;
+    }
+
     protected void initExcelBean() {
         Class<? extends ExcelBean> clazz = this.getClass();
-        boolean hasExcelSheetAnnotation = clazz.isAnnotationPresent(ExcelSheet.class);
-        if (hasExcelSheetAnnotation) {
-            ExcelSheet annExcelSheet = clazz.getAnnotation(ExcelSheet.class);
-            this.autoColumnFormat = annExcelSheet.autoColumnFormat();
+        //获取工作簿基本信息
+        Optional.ofNullable(clazz.getAnnotation(ExcelSheet.class)).ifPresent(annExcelSheet -> {
+            this.autoFormat = annExcelSheet.autoFormat();
             this.sheetName = annExcelSheet.sheetName();
-        }
-        boolean hasExcelTitle = clazz.isAnnotationPresent(ExcelTitle.class);
-        if (hasExcelTitle) {
-            this.sheetTitle = clazz.getAnnotation(ExcelTitle.class).title();
-        }
-        boolean hasAutoGeneateCoding = clazz.isAnnotationPresent(AutoGeneateCoding.class);
-        if (hasAutoGeneateCoding) {
-            this.autoGeneateCoding = true;
-            AutoGeneateCoding annGeneateCoding = clazz.getAnnotation(AutoGeneateCoding.class);
+        });
+        //获取工作簿大标题
+        Optional.ofNullable(clazz.getAnnotation(ExcelTitle.class)).ifPresent(excelTitle -> this.sheetTitle = excelTitle.title());
+        //获取工作簿自动编码
+        Optional.ofNullable(clazz.getAnnotation(AutoGeneateCoding.class)).ifPresent(annGeneateCoding -> {
             this.codingColumnName = annGeneateCoding.codingColumnName();
             this.codingStart = annGeneateCoding.codingStart();
-        }
+        });
         Field[] fields = clazz.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>();
         for (Field field : fields) {
@@ -91,10 +100,7 @@ public class ExcelBean {
             ExcelColumn annotation = e.getAnnotation(ExcelColumn.class);
             return annotation.sort();
         })).entrySet().stream().map(
-                (entry) -> {
-                    System.out.println(entry.getKey());
-                    return new ColumnInfo(entry.getValue());
-                }
+                (entry) -> new ColumnInfo(entry.getValue())
         ).collect(Collectors.toList());
         return collect;
     }
@@ -104,6 +110,7 @@ public class ExcelBean {
         private String titleName; //标题名
         private int columnNum;  //占用的列数
         private List<FieldInfo> fieldInfoList;
+
         public ColumnInfo(List<Field> fields) {
             this.columnNum = fields.size();
             fieldInfoList = new ArrayList<>();
@@ -111,11 +118,15 @@ public class ExcelBean {
                 boolean hasann = field.isAnnotationPresent(ExcelTitle.class);
                 if (hasann) {
                     ExcelTitle etann = field.getAnnotation(ExcelTitle.class);
-                    titleName = etann.title();
+                    if (StringUtil.isNotNull(etann.title())) {
+                        titleName = etann.title();
+                        hasColumuTitle = true;
+                    }
                 }
                 fieldInfoList.add(new FieldInfo(field));
             }
         }
+
         public String getTitleName() {
             return titleName;
         }
@@ -129,34 +140,24 @@ public class ExcelBean {
         }
     }
 
-    protected class FieldInfo{
+    protected class FieldInfo {
         private String columnName;
-        private int sort;
         private String defaultValue;
-        private Field field;
 
         public FieldInfo(Field field) {
+            fields.add(field);
             ExcelColumn annotation = field.getAnnotation(ExcelColumn.class);
             this.columnName = annotation.columnName();
-            this.sort = annotation.sort();
             this.defaultValue = annotation.defaultValue();
-            this.field = field;
         }
 
         public String getColumnName() {
             return columnName;
         }
 
-        public int getSort() {
-            return sort;
-        }
-
         public String getDefaultValue() {
             return defaultValue;
         }
 
-        public Field getField() {
-            return field;
-        }
     }
 }

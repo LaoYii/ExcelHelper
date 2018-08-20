@@ -1,5 +1,6 @@
 package util;
 
+import enums.DateType;
 import util.DateUtil;
 
 import java.io.File;
@@ -21,7 +22,7 @@ public final class FileUtil {
     
     public static File timestampFile(File file){
         String fileName = getFileName(file);
-        return fileRename(fileName+ DateUtil.getTimestamp(),file);
+        return fileRename(fileName+ DateUtil.getTimestamp(DateType.YEAR_MONTH_DAY_24HOUR_MIN_SEC),file);
     }
 
     /**

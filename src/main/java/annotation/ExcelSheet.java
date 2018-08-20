@@ -14,5 +14,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ExcelSheet {
     String sheetName();
-    boolean autoColumnFormat() default true;
+    boolean autoFormat() default true;
 }
