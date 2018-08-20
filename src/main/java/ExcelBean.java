@@ -4,7 +4,6 @@ import annotation.ExcelSheet;
 import annotation.ExcelTitle;
 
 import java.lang.reflect.Field;
-import java.security.cert.Extension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,12 +14,11 @@ public class ExcelBean {
     private String codingColumnName;
     private int codingStart;
     private String sheetName;
-    private String title;
+    private String sheetTitle;
     private int columnSize = 0;
     private List<ColumnInfo> columnInfos;
     
     protected String getSheetName() {
-        if(this.sheetName  == null) return "Sheet";
         return sheetName;
     }
 
@@ -40,8 +38,8 @@ public class ExcelBean {
         return codingStart;
     }
 
-    protected String getTitle() {
-        return title;
+    protected String getSheetTitle() {
+        return sheetTitle;
     }
 
     protected int getColumnSize() {
@@ -62,7 +60,7 @@ public class ExcelBean {
         }
         boolean hasExcelTitle = clazz.isAnnotationPresent(ExcelTitle.class);
         if (hasExcelTitle) {
-            this.title = clazz.getAnnotation(ExcelTitle.class).title();
+            this.sheetTitle = clazz.getAnnotation(ExcelTitle.class).title();
         }
         boolean hasAutoGeneateCoding = clazz.isAnnotationPresent(AutoGeneateCoding.class);
         if (hasAutoGeneateCoding) {
@@ -77,7 +75,6 @@ public class ExcelBean {
             boolean hasExcelColumnAnnotation = field.isAnnotationPresent(ExcelColumn.class);
             if (hasExcelColumnAnnotation) {
                 columnSize++;
-                ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
                 fieldList.add(field);
             }
         }
