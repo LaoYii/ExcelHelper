@@ -27,7 +27,7 @@ public final class ExcelHelper {
      * @param <T extends ExeclBean>
      * @return
      */
-    public static <T extends ExcelBean> List<T> parse(String filePath, T bean){
+    private static <T extends ExcelBean> List<T> parse(String filePath, T bean){
 
         return null;
     }
@@ -53,7 +53,7 @@ public final class ExcelHelper {
      * @param <T extends ExeclBean>
      * @return
      */
-    public static <T extends ExcelBean> void export(File file, T beans, List<Map<String,Object>> dataMap){
+    private static <T extends ExcelBean> void export(File file, T beans, List<Map<String,Object>> dataMap){
         
     }
 
