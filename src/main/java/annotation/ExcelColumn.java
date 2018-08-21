@@ -1,5 +1,7 @@
 package annotation;
 
+import enums.DateType;
+
 import java.lang.annotation.*;
 import java.util.Comparator;
 
@@ -13,4 +15,5 @@ public @interface ExcelColumn {
     String columnName();
     int sort();
     String defaultValue() default "";
+    DateType dateType() default DateType.YEAR_MONTH_DAY;
 }

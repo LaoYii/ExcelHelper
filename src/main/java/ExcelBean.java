@@ -2,6 +2,7 @@ import annotation.AutoGeneateCoding;
 import annotation.ExcelColumn;
 import annotation.ExcelSheet;
 import annotation.ExcelTitle;
+import enums.DateType;
 import util.StringUtil;
 
 import java.lang.reflect.Field;
@@ -21,7 +22,7 @@ public class ExcelBean {
     private List<ColumnInfo> columnInfos;
 
     private boolean hasColumuTitle = false;
-    private List<Field> fields = new ArrayList<>();
+    private List<FieldInfo> fieldInfos = new ArrayList<>();
 
 
     protected String getSheetName() {
@@ -60,8 +61,8 @@ public class ExcelBean {
         return hasColumuTitle;
     }
 
-    public List<Field> getFields() {
-        return fields;
+    public List<FieldInfo> getFieldInfos() {
+        return fieldInfos;
     }
 
     protected void initExcelBean() {
@@ -123,7 +124,9 @@ public class ExcelBean {
                         hasColumuTitle = true;
                     }
                 }
-                fieldInfoList.add(new FieldInfo(field));
+                FieldInfo fieldInfo = new FieldInfo(field);
+                fieldInfoList.add(fieldInfo);
+                fieldInfos.add(fieldInfo);
             }
         }
 
@@ -143,12 +146,15 @@ public class ExcelBean {
     protected class FieldInfo {
         private String columnName;
         private String defaultValue;
+        private DateType dateType;
+        private Field field;
 
         public FieldInfo(Field field) {
-            fields.add(field);
             ExcelColumn annotation = field.getAnnotation(ExcelColumn.class);
             this.columnName = annotation.columnName();
             this.defaultValue = annotation.defaultValue();
+            this.dateType = annotation.dateType();
+            this.field = field;
         }
 
         public String getColumnName() {
@@ -159,5 +165,12 @@ public class ExcelBean {
             return defaultValue;
         }
 
+        public DateType getDateType() {
+            return dateType;
+        }
+
+        public Field getField() {
+            return field;
+        }
     }
 }

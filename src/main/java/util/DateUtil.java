@@ -25,5 +25,9 @@ public final class DateUtil {
                 .replace(" ","")
                 .replace(":","");
     }
-    
+
+    public static String getFormat(DateType dateType,Date date){
+        return getFormat(dateType.getFormat()).format(date);
+    }
+
 }

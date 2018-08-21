@@ -39,7 +39,7 @@ public final class ExcelHelper {
      * @param <T extends ExeclBean>
      * @return
      */
-    public static <T extends ExcelBean> void export(File file, List<T> beans) throws ExcelFileError, IOException {
+    public static <T extends ExcelBean> void export(File file, List<T> beans) throws ExcelFileError, IOException, IllegalAccessException {
         File outFile = FileUtil.checkFileIfExistReturnTimestamp(file);
         Workbook wb = ExcelWriter.getExcelWriter().writer(ExcelUtil.getWorkbook(), beans);
         wb.write(new FileOutputStream(outFile));
@@ -63,8 +63,13 @@ public final class ExcelHelper {
      * @param beansList 会根据beas排序排列sheet的顺序
      * @param <T>
      */
-    public static <T extends ExcelBean> void batchExport(File file,LinkedList<List<T>> beansList){
-
+    public static <T extends ExcelBean> void batchExport(File file,LinkedList<List<T>> beansList) throws ExcelFileError, IllegalAccessException, IOException {
+        Workbook wb = null;
+        for (List<T> ts : beansList) {
+            wb = exportPvt(ts, wb);
+        }
+        File outFile = FileUtil.checkFileIfExistReturnTimestamp(file);
+        wb.write(new FileOutputStream(outFile));
     }
 
     /**
@@ -73,8 +78,34 @@ public final class ExcelHelper {
      * @param <T>
      * @return
      */
-    public static <T extends ExcelBean> ByteOutputStream export(List<T> beans){
-        return null;
+    public static <T extends ExcelBean> ByteOutputStream exportByte(List<T> beans) throws IOException, IllegalAccessException {
+        ByteOutputStream byteOutputStream = new ByteOutputStream();
+        Workbook wb = exportPvt(beans, ExcelUtil.getWorkbook());
+        wb.write(byteOutputStream);
+        return byteOutputStream;
+    }
+
+    /**
+     * 将excle转换为字节流
+     * @param beansList
+     * @param <T>
+     * @return
+     */
+    public static <T extends ExcelBean> ByteOutputStream batchExportByte(LinkedList<List<T>> beansList) throws IOException, IllegalAccessException {
+        ByteOutputStream byteOutputStream = new ByteOutputStream();
+        Workbook wb = null;
+        for (List<T> ts : beansList) {
+            wb = exportPvt(ts, wb);
+        }
+        wb.write(byteOutputStream);
+        return byteOutputStream;
+    }
+
+
+    private static <T extends ExcelBean> Workbook exportPvt(List<T> t,Workbook wb) throws ExcelFileError, IllegalAccessException {
+        if(wb == null) wb = ExcelWriter.getExcelWriter().writer(ExcelUtil.getWorkbook(), t);
+        wb = ExcelWriter.getExcelWriter().writer(wb, t);
+        return wb;
     }
 
 }

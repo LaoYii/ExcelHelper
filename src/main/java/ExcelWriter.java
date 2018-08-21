@@ -1,5 +1,7 @@
+import enums.DateType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import util.DateUtil;
 import util.ExcelUtil;
 import util.StringUtil;
 
@@ -20,7 +22,7 @@ final class ExcelWriter {
         return excelWriter;
     }
 
-    protected <T extends ExcelBean> Workbook writer(Workbook wb, List<T> beans) {
+    protected <T extends ExcelBean> Workbook writer(Workbook wb, List<T> beans) throws IllegalAccessException{
         T bean = beans.get(0);
         bean.initExcelBean();
         Sheet sheet = ExcelUtil.getSheet(wb, bean.getSheetName());
@@ -72,23 +74,13 @@ final class ExcelWriter {
         }
     }
 
-    private <T extends ExcelBean> void putData(Sheet sheet, List<T> data, T bean) {
+    private <T extends ExcelBean> void putData(Sheet sheet, List<T> data, T bean) throws IllegalAccessException {
         int startRow = dataStartRow(sheet);
-        List<Field> fields = bean.getFields();
+        List<ExcelBean.FieldInfo> fields = bean.getFieldInfos();
         for (T d : data) {
             Row row = sheet.createRow(startRow);
             for (int i = 0; i < fields.size(); i++) {
-                final int j = i;
-                Field field = fields.get(i);
-                field.setAccessible(true);
-                try {
-                    Optional.ofNullable(field.get(d)).ifPresent(o -> {
-                        setValue(row.createCell(j),o);
-                    });
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    continue;
-                }
+                setValue(row.createCell(i), fields.get(i), d);
             }
         }
     }
@@ -108,9 +100,14 @@ final class ExcelWriter {
         return sheet.getLastRowNum() + 1;
     }
 
-    private void setValue(Cell cell, Object o) {
+    private <T extends ExcelBean> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T d) throws IllegalAccessException {
+        Field field = fieldInfo.getField();
+        field.setAccessible(true);
+        Object o = field.get(d);
+        Optional.ofNullable(o).orElse(o = fieldInfo.getDefaultValue());
         if (o instanceof Date) {
-            cell.setCellValue((Date) o);
+            DateType dateType = fieldInfo.getDateType();
+            cell.setCellValue(DateUtil.getFormat(dateType, (Date) o));
         } else if (o instanceof Double) {
             cell.setCellValue((double) o);
         } else if (o instanceof String) {
@@ -121,7 +118,7 @@ final class ExcelWriter {
             cell.setCellValue((Calendar) o);
         } else if (o instanceof RichTextString) {
             cell.setCellValue((RichTextString) o);
-        }else{
+        } else {
             cell.setCellValue(o.toString());
         }
     }
