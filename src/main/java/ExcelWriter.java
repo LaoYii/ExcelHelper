@@ -78,7 +78,7 @@ final class ExcelWriter {
         int startRow = dataStartRow(sheet);
         List<ExcelBean.FieldInfo> fields = bean.getFieldInfos();
         for (T d : data) {
-            Row row = sheet.createRow(startRow);
+            Row row = sheet.createRow(startRow++);
             for (int i = 0; i < fields.size(); i++) {
                 setValue(row.createCell(i), fields.get(i), d);
             }
@@ -104,7 +104,9 @@ final class ExcelWriter {
         Field field = fieldInfo.getField();
         field.setAccessible(true);
         Object o = field.get(d);
-        Optional.ofNullable(o).orElse(o = fieldInfo.getDefaultValue());
+        if (o == null) {
+            o = fieldInfo.getDefaultValue();
+        }
         if (o instanceof Date) {
             DateType dateType = fieldInfo.getDateType();
             cell.setCellValue(DateUtil.getFormat(dateType, (Date) o));

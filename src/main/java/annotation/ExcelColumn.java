@@ -16,4 +16,6 @@ public @interface ExcelColumn {
     int sort();
     String defaultValue() default "";
     DateType dateType() default DateType.YEAR_MONTH_DAY;
+
+
 }
