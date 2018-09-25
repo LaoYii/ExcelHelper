@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ExcelBean {
+
+    private Class clazz;
+
     private boolean autoFormat = true;
     private boolean autoGeneateCoding = false;
     private String codingColumnName;
@@ -65,8 +68,14 @@ public class ExcelBean {
         return fieldInfos;
     }
 
+    public ExcelBean(Class clazz){
+        this.clazz = clazz;
+    }
+
+
     protected void initExcelBean() {
-        Class<? extends ExcelBean> clazz = this.getClass();
+        Class<?> clazz = this.clazz;
+        ExcelSheet annotation = clazz.getAnnotation(ExcelSheet.class);
         //获取工作簿基本信息
         Optional.ofNullable(clazz.getAnnotation(ExcelSheet.class)).ifPresent(annExcelSheet -> {
             this.autoFormat = annExcelSheet.autoFormat();

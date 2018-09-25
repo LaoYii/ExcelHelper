@@ -6,6 +6,8 @@ import util.ExcelUtil;
 import util.StringUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -17,18 +19,24 @@ final class ExcelWriter {
 
     protected static ExcelWriter getExcelWriter() {
         if (excelWriter == null) {
-            excelWriter = new ExcelWriter();
+            synchronized (ExcelWriter.class){
+                if (excelWriter == null){
+                    excelWriter = new ExcelWriter();
+                }
+            }
         }
         return excelWriter;
     }
 
-    protected <T extends ExcelBean> Workbook writer(Workbook wb, List<T> beans) throws IllegalAccessException{
-        T bean = beans.get(0);
-        bean.initExcelBean();
-        Sheet sheet = ExcelUtil.getSheet(wb, bean.getSheetName());
-        addSheetTitle(sheet, bean);
-        addColumuTitle(sheet, bean);
-        putData(sheet, beans, bean);
+    protected <T> Workbook writer(Workbook wb, List<T> beans) throws IllegalAccessException {
+        if (beans.size() != 0){
+            ExcelBean excelBean = new ExcelBean(beans.get(0).getClass());
+            excelBean.initExcelBean();
+            Sheet sheet = ExcelUtil.getSheet(wb, excelBean.getSheetName());
+            addSheetTitle(sheet, excelBean);
+            addColumuTitle(sheet, excelBean);
+            putData(sheet, beans, excelBean);
+        }
         return wb;
     }
 
@@ -74,7 +82,7 @@ final class ExcelWriter {
         }
     }
 
-    private <T extends ExcelBean> void putData(Sheet sheet, List<T> data, T bean) throws IllegalAccessException {
+    private <T> void putData(Sheet sheet, List<T> data, ExcelBean bean) throws IllegalAccessException {
         int startRow = dataStartRow(sheet);
         List<ExcelBean.FieldInfo> fields = bean.getFieldInfos();
         for (T d : data) {
@@ -100,7 +108,7 @@ final class ExcelWriter {
         return sheet.getLastRowNum() + 1;
     }
 
-    private <T extends ExcelBean> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T d) throws IllegalAccessException {
+    private <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T d) throws IllegalAccessException {
         Field field = fieldInfo.getField();
         field.setAccessible(true);
         Object o = field.get(d);

@@ -6,7 +6,7 @@ import java.util.Date;
 
 @ExcelSheet(sheetName = "示例")
 @ExcelTitle(title = "工作簿标题")
-public class ExampleBean extends ExcelBean {
+public class ExampleBean {
 
     @ExcelColumn(columnName = "姓名",sort = 1)
     private String name;
