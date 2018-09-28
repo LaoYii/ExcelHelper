@@ -1,3 +1,7 @@
 .idea
-/target
-excel-helper.iml
+*.iws
+*.iml
+*.ipr
+.gitee
+.target
+.git
