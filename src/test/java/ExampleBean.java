@@ -1,30 +1,29 @@
-import annotation.ExcelColumn;
-import annotation.ExcelSheet;
-import annotation.ExcelTitle;
+import red.hohola.jane.base.excel.annotation.ExcelColumn;
+import red.hohola.jane.base.excel.annotation.ExcelSheet;
+import red.hohola.jane.base.excel.annotation.ExcelTitle;
 
 import java.util.Date;
 
 @ExcelSheet(sheetName = "示例")
-@ExcelTitle(title = "工作簿标题")
+@ExcelTitle("工作簿标题")
 public class ExampleBean {
 
-    @ExcelColumn(columnName = "姓名",sort = 1)
+    @ExcelColumn(name = "姓名",sort = 1)
     private String name;
 
-    @ExcelColumn(columnName = "年龄",sort = 2)
+    @ExcelColumn(name = "年龄",sort = 2)
     private int age;
 
-    @ExcelColumn(columnName = "生日",sort = 3)
+    @ExcelColumn(name = "生日",sort = 3)
     private Date birthday;
 
-    @ExcelColumn(columnName = "语文",sort = 4)
-    @ExcelTitle(title = "成绩")
+    @ExcelColumn(name = "语文",sort = 4)
     private double chinese;
 
-    @ExcelColumn(columnName = "数学",sort = 4)
+    @ExcelColumn(name = "数学",sort = 4)
     private double math;
 
-    @ExcelColumn(columnName = "英语",sort = 4)
+    @ExcelColumn(name = "英语",sort = 4)
     private double english;
 
     public String getName() {

@@ -1,4 +1,4 @@
-package enums;
+package red.hohola.jane.base.excel.enums;
 
 public enum DateType {
     YEAR_MONTH_DAY_24HOUR_MIN_SEC ("yyyy-MM-dd HH:mm:ss"),

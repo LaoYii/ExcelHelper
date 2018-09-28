@@ -1,12 +1,50 @@
+import red.hohola.jane.base.excel.ExcelHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Test {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, IOException, InstantiationException, ParseException {
+
+        /*Field[] declaredFields = ExampleBean.class.getDeclaredFields();
+        for (Field s : declaredFields) {
+            System.out.println(s.getType());
+            System.out.println(s.getType().equals(Date.class));
+        }*/
+        /*int loop = 0;
+        String name = "abc";
+        while (!"abc10".equals(name)){
+            if (loop == 0) {
+                name = name + ++loop;
+            }else{
+                name = StringUtil.replaceLast(name,String.valueOf(loop),String.valueOf(++loop));
+            }
+            System.out.println(name);
+        }
+        System.out.println("--------------");
+        System.out.println(name);*/
+        
+        /*File file = new File("C:\\Users\\tyhdl\\Desktop\\123.xls");
+        try {
+            Workbook workbook = ExcelUtil.getWorkbook(file);
+            ExcelUtil.getSheet(workbook,null);
+        } catch (IOException e) {
+            
+            
+        }*/
+        
+        
+        //readTest
+        /*File file = new File("C:\\Users\\tyhdl\\Desktop\\example.xlsx");
+        List<ExampleBean> parse = ExcelHelper.parse(file, ExampleBean.class);
+        System.out.println(parse);*/
+        
         ArrayList<ExampleBean> list = new ArrayList<>();
         String[] names = {"写","示","例","脑","壳","疼","好","想","睡","觉"};
         DecimalFormat df = new DecimalFormat("#.00");

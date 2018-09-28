@@ -1,4 +1,4 @@
-package annotation;
+package red.hohola.jane.base.excel.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE,ElementType.FIELD})
 public @interface ExcelTitle {
-    String title();
+    String value();
 }

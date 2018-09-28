@@ -1,4 +1,4 @@
-package annotation;
+package red.hohola.jane.base.excel.annotation;
 
 /**
  * 自动编码注解

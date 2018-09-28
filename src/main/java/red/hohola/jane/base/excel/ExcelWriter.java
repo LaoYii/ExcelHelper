@@ -1,13 +1,13 @@
-import enums.DateType;
+package red.hohola.jane.base.excel;
+
+import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import util.DateUtil;
-import util.ExcelUtil;
-import util.StringUtil;
+import red.hohola.jane.base.excel.enums.DateType;
+import red.hohola.jane.base.excel.util.DateUtil;
+import red.hohola.jane.base.excel.util.ExcelUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +31,7 @@ final class ExcelWriter {
     protected <T> Workbook writer(Workbook wb, List<T> beans) throws IllegalAccessException {
         if (beans.size() != 0){
             ExcelBean excelBean = new ExcelBean(beans.get(0).getClass());
-            excelBean.initExcelBean();
-            Sheet sheet = ExcelUtil.getSheet(wb, excelBean.getSheetName());
+            Sheet sheet = ExcelUtil.getSheet(wb, excelBean.getSheetName(),true);
             addSheetTitle(sheet, excelBean);
             addColumuTitle(sheet, excelBean);
             putData(sheet, beans, excelBean);
@@ -42,7 +41,7 @@ final class ExcelWriter {
 
     private <T extends ExcelBean> void addSheetTitle(Sheet sheet, T bean) {
         String sheetTitle = bean.getSheetTitle();
-        if (StringUtil.isNotNull(sheetTitle)) {
+        if (!Strings.isNullOrEmpty(sheetTitle)) {
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, bean.getColumnSize() - 1));
             sheet.createRow(0).createCell(0).setCellValue(sheetTitle);
         }
@@ -61,7 +60,7 @@ final class ExcelWriter {
                 if (nextRow == null) nextRow = sheet.createRow(startRow + 1);
                 batchCreateCell(row, startColumu, endColumu);
                 batchCreateCell(nextRow, startColumu, endColumu);
-                if (StringUtil.isNotNull(ci.getTitleName())) {
+                if (!Strings.isNullOrEmpty(ci.getTitleName())) {
                     sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, startColumu, endColumu));
                     row.getCell(startColumu).setCellValue(ci.getTitleName());
                     for (ExcelBean.FieldInfo fieldInfo : ci.getFieldInfoList()) {
@@ -107,8 +106,8 @@ final class ExcelWriter {
     private int dataStartRow(Sheet sheet) {
         return sheet.getLastRowNum() + 1;
     }
-
-    private <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T d) throws IllegalAccessException {
+    
+    public static <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T d) throws IllegalAccessException {
         Field field = fieldInfo.getField();
         field.setAccessible(true);
         Object o = field.get(d);
@@ -132,5 +131,6 @@ final class ExcelWriter {
             cell.setCellValue(o.toString());
         }
     }
+    
 
 }

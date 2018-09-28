@@ -1,17 +1,20 @@
-import annotation.AutoGeneateCoding;
-import annotation.ExcelColumn;
-import annotation.ExcelSheet;
-import annotation.ExcelTitle;
-import enums.DateType;
-import util.StringUtil;
+package red.hohola.jane.base.excel;
+
+import red.hohola.jane.base.excel.annotation.AutoGeneateCoding;
+import red.hohola.jane.base.excel.annotation.ExcelColumn;
+import red.hohola.jane.base.excel.annotation.ExcelSheet;
+import red.hohola.jane.base.excel.annotation.ExcelTitle;
+import com.google.common.base.Strings;
+import red.hohola.jane.base.excel.enums.DateType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ExcelBean {
+final class ExcelBean {
 
     private Class clazz;
 
@@ -25,7 +28,7 @@ public class ExcelBean {
     private List<ColumnInfo> columnInfos;
 
     private boolean hasColumuTitle = false;
-    private List<FieldInfo> fieldInfos = new ArrayList<>();
+    private List<FieldInfo> fieldInfos = new LinkedList<>();
 
 
     protected String getSheetName() {
@@ -70,6 +73,7 @@ public class ExcelBean {
 
     public ExcelBean(Class clazz){
         this.clazz = clazz;
+        initExcelBean();
     }
 
 
@@ -82,7 +86,7 @@ public class ExcelBean {
             this.sheetName = annExcelSheet.sheetName();
         });
         //获取工作簿大标题
-        Optional.ofNullable(clazz.getAnnotation(ExcelTitle.class)).ifPresent(excelTitle -> this.sheetTitle = excelTitle.title());
+        Optional.ofNullable(clazz.getAnnotation(ExcelTitle.class)).ifPresent(excelTitle -> this.sheetTitle = excelTitle.value());
         //获取工作簿自动编码
         Optional.ofNullable(clazz.getAnnotation(AutoGeneateCoding.class)).ifPresent(annGeneateCoding -> {
             this.codingColumnName = annGeneateCoding.codingColumnName();
@@ -125,14 +129,13 @@ public class ExcelBean {
             this.columnNum = fields.size();
             fieldInfoList = new ArrayList<>();
             for (Field field : fields) {
-                boolean hasann = field.isAnnotationPresent(ExcelTitle.class);
-                if (hasann) {
-                    ExcelTitle etann = field.getAnnotation(ExcelTitle.class);
-                    if (StringUtil.isNotNull(etann.title())) {
-                        titleName = etann.title();
+                ExcelTitle annotation = field.getAnnotation(ExcelTitle.class);
+                Optional.ofNullable(field.getAnnotation(ExcelTitle.class)).ifPresent(etann->{
+                    if (!Strings.isNullOrEmpty(etann.value())) {
+                        titleName = etann.value();
                         hasColumuTitle = true;
                     }
-                }
+                });
                 FieldInfo fieldInfo = new FieldInfo(field);
                 fieldInfoList.add(fieldInfo);
                 fieldInfos.add(fieldInfo);
@@ -160,7 +163,7 @@ public class ExcelBean {
 
         public FieldInfo(Field field) {
             ExcelColumn annotation = field.getAnnotation(ExcelColumn.class);
-            this.columnName = annotation.columnName();
+            this.columnName = annotation.name();
             this.defaultValue = annotation.defaultValue();
             this.dateType = annotation.dateType();
             this.field = field;
