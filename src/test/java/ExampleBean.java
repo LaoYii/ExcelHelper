@@ -4,7 +4,7 @@ import red.hohola.jane.base.excel.annotation.ExcelTitle;
 
 import java.util.Date;
 
-@ExcelSheet(sheetName = "示例")
+@ExcelSheet("示例")
 @ExcelTitle("工作簿标题")
 public class ExampleBean {
 
