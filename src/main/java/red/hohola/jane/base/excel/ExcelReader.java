@@ -37,8 +37,8 @@ final class ExcelReader {
         int lastRowNum = sheet.getLastRowNum();
         ArrayList<T> ts = new ArrayList<>();
         Map<Integer, ExcelBean.FieldInfo> fieldMap = collectFileFiled(sheet, excelBean);
-        for (int i = dataStartRowNum; i < lastRowNum; i++) {
-            ts.add(putData(sheet.getRow(dataStartRowNum),clazz,fieldMap));
+        for (int i = dataStartRowNum; i <= lastRowNum; i++) {
+            ts.add(putData(sheet.getRow(i), clazz, fieldMap));
         }
         return ts;
     }
@@ -75,9 +75,9 @@ final class ExcelReader {
         Object o = clazz.newInstance();
         for (Map.Entry<Integer, ExcelBean.FieldInfo> entry : fieldMap.entrySet()) {
             Cell cell = row.getCell(entry.getKey());
-            setValue(cell,entry.getValue(),o);
+            setValue(cell, entry.getValue(), o);
         }
-        return (T)o;
+        return (T) o;
     }
 
     public static <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T o) throws IllegalAccessException, ParseException {
@@ -85,23 +85,28 @@ final class ExcelReader {
         field.setAccessible(true);
         if (field.getType().equals(Date.class)) {
             DateType dateType = fieldInfo.getDateType();
-            field.set(o,DateUtil.parse(dateType,cell.getStringCellValue()));
+            field.set(o, DateUtil.parse(dateType, cell.getStringCellValue()));
         } else if (field.getType().equals(Double.class) || field.getType().equals(double.class)) {
-            field.set(o,cell.getNumericCellValue());
+            field.set(o, cell.getNumericCellValue());
         } else if (field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) {
-            field.set(o,cell.getBooleanCellValue());
+            field.set(o, cell.getBooleanCellValue());
         } else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
-            field.set(o,Integer.valueOf(cell.getStringCellValue()));
+            field.set(o, Integer.valueOf(cell.getStringCellValue()));
         } else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
-            field.set(o,Long.valueOf(cell.getStringCellValue()));
+            field.set(o, Long.valueOf(cell.getStringCellValue()));
         } else if (field.getType().equals(Float.class) || field.getType().equals(float.class)) {
-            field.set(o,Float.valueOf(String.valueOf(cell.getNumericCellValue())));
-        }else if (field.getType().equals(Short.class) || field.getType().equals(short.class)) {
-            field.set(o,Short.valueOf(cell.getStringCellValue()));
-        }else if (field.getType().equals(Byte.class) || field.getType().equals(byte.class)) {
-            field.set(o,Byte.valueOf(cell.getStringCellValue()));
-        }else {
-            field.set(o,cell.getStringCellValue());
+            field.set(o, Float.valueOf(String.valueOf(cell.getNumericCellValue())));
+        } else if (field.getType().equals(Short.class) || field.getType().equals(short.class)) {
+            field.set(o, Short.valueOf(cell.getStringCellValue()));
+        } else if (field.getType().equals(Byte.class) || field.getType().equals(byte.class)) {
+            field.set(o, Byte.valueOf(cell.getStringCellValue()));
+        } else {
+            if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                field.set(o, String.valueOf(cell.getNumericCellValue()));
+            } else {
+                field.set(o, cell.getStringCellValue());
+            }
+
         }
     }
 

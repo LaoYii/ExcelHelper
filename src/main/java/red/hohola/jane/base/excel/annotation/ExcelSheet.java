@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ExcelSheet {
-    String sheetName() default "";
+    String value() default "";
     boolean autoFormat() default true;
 }

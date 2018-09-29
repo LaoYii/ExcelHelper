@@ -83,7 +83,7 @@ final class ExcelBean {
         //获取工作簿基本信息
         Optional.ofNullable(clazz.getAnnotation(ExcelSheet.class)).ifPresent(annExcelSheet -> {
             this.autoFormat = annExcelSheet.autoFormat();
-            this.sheetName = annExcelSheet.sheetName();
+            this.sheetName = annExcelSheet.value();
         });
         //获取工作簿大标题
         Optional.ofNullable(clazz.getAnnotation(ExcelTitle.class)).ifPresent(excelTitle -> this.sheetTitle = excelTitle.value());
