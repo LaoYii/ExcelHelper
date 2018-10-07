@@ -10,6 +10,7 @@ import red.hohola.jane.base.excel.exception.ExcelFileNotFound;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 public final class ExcelUtil {
@@ -20,21 +21,30 @@ public final class ExcelUtil {
 
     public static Workbook getWorkbook(File file) throws IOException {
         if (file == null) return new XSSFWorkbook();
+        String fileSuffix = FileUtil.getFileSuffix(file.getPath());
         if (file.length() == 0) {
-            String fileSuffix = FileUtil.getFileSuffix(file.getPath());
             if (".xls".equals(fileSuffix)) return new HSSFWorkbook();
             else if (".xlsx".equals(fileSuffix)) return new XSSFWorkbook();
             else throw new ExcelFileNotFound(ExcelFileNotFound.FILE_NAME_ERROR);
         } else {
             try (FileInputStream inputStream = new FileInputStream(file)) {
-                String fileSuffix = FileUtil.getFileSuffix(file.getPath());
-                if (".xls".equals(fileSuffix)) return new HSSFWorkbook(inputStream);
-                else if (".xlsx".equals(fileSuffix)) return new XSSFWorkbook(inputStream);
-                else throw new ExcelFileNotFound(ExcelFileNotFound.FILE_NAME_ERROR);
+                return getWorkbook(file.getName(), inputStream);
             } catch (IOException e) {
                 throw e;
             }
         }
+    }
+
+    public static Workbook getWorkbook(String fileName, InputStream inputStream) throws IOException {
+        String fileSuffix = FileUtil.getFileSuffix(fileName);
+        if (fileSuffix != null) {
+            if (".xls".equals(fileSuffix)) return new HSSFWorkbook(inputStream);
+            else if (".xlsx".equals(fileSuffix)) return new XSSFWorkbook(inputStream);
+            else throw new ExcelFileNotFound(ExcelFileNotFound.FILE_NAME_ERROR);
+        } else {
+            throw new IllegalArgumentException("fileName not null");
+        }
+
     }
 
     /**
@@ -82,6 +92,6 @@ public final class ExcelUtil {
             return sheet;
         }
     }
-    
+
 
 }

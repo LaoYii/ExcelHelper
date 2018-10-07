@@ -8,6 +8,7 @@ import red.hohola.jane.base.excel.util.ExcelUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.*;
@@ -26,13 +27,12 @@ final class ExcelReader {
         return excelReader;
     }
 
-    protected <T> List<T> read(File file, Class clazz) throws IOException, InstantiationException, IllegalAccessException, ParseException {
+    private <T> List<T> read(Workbook wb,Class clazz) throws IllegalAccessException, ParseException, InstantiationException {
         ExcelBean excelBean = new ExcelBean(clazz);
         int dataStartRowNum = excelBean.isHasColumuTitle() ? 2 : 1;
         if (!Strings.isNullOrEmpty(excelBean.getSheetTitle())) {
             dataStartRowNum++;
         }
-        Workbook wb = ExcelUtil.getWorkbook(file);
         Sheet sheet = ExcelUtil.getSheetIfNullRtnFirstSheet(wb, excelBean.getSheetName());
         int lastRowNum = sheet.getLastRowNum();
         ArrayList<T> ts = new ArrayList<>();
@@ -41,6 +41,16 @@ final class ExcelReader {
             ts.add(putData(sheet.getRow(i), clazz, fieldMap));
         }
         return ts;
+    }
+
+    protected <T> List<T> read(File file, Class clazz) throws IOException, InstantiationException, IllegalAccessException, ParseException {
+        Workbook wb = ExcelUtil.getWorkbook(file);
+        return read(wb, clazz);
+    }
+
+    protected <T> List<T> read(String fileName,InputStream in, Class clazz) throws IOException, InstantiationException, IllegalAccessException, ParseException {
+        Workbook wb = ExcelUtil.getWorkbook(fileName,in);
+        return read(wb, clazz);
     }
 
     private Map<Integer, ExcelBean.FieldInfo> collectFileFiled(Sheet sheet, ExcelBean excelBean) {
@@ -80,7 +90,7 @@ final class ExcelReader {
         return (T) o;
     }
 
-    public static <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T o) throws IllegalAccessException, ParseException {
+    private static <T> void setValue(Cell cell, ExcelBean.FieldInfo fieldInfo, T o) throws IllegalAccessException, ParseException {
         Field field = fieldInfo.getField();
         field.setAccessible(true);
         if (field.getType().equals(Date.class)) {
@@ -101,7 +111,7 @@ final class ExcelReader {
         } else if (field.getType().equals(Byte.class) || field.getType().equals(byte.class)) {
             field.set(o, Byte.valueOf(cell.getStringCellValue()));
         } else {
-            if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+            if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
                 field.set(o, String.valueOf(cell.getNumericCellValue()));
             } else {
                 field.set(o, cell.getStringCellValue());

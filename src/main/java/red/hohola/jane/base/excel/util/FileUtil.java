@@ -11,7 +11,7 @@ public final class FileUtil {
     }
 
     public static String getFileSuffix(String path) {
-        return path.substring(path.lastIndexOf("."), path.length());
+        return path.substring(path.lastIndexOf("."));
     }
 
     public static String getFileName(File file) {

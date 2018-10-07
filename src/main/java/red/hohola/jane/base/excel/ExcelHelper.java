@@ -4,10 +4,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import red.hohola.jane.base.excel.util.ExcelUtil;
 import red.hohola.jane.base.excel.util.FileUtil;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +23,6 @@ public final class ExcelHelper {
      * @return
      */
     public static <T> List<T> parse(String filePath, Class clazz) {
-        
         return parse(new File(filePath),clazz);
     }
     
@@ -35,6 +31,17 @@ public final class ExcelHelper {
         try{
             ExcelReader reader = ExcelReader.getExcelWriter();
             read = reader.read(file, clazz);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return read;
+    }
+
+    public static <T> List<T> parse(String fileName,InputStream in, Class clazz){
+        List<T> read = null;
+        try{
+            ExcelReader reader = ExcelReader.getExcelWriter();
+            read = reader.read(fileName,in, clazz);
         } catch (Exception e){
             e.printStackTrace();
         }
